@@ -99,7 +99,8 @@ textarea {
 
 body {
     font-family: 'Roboto', sans-serif;
-    background: #eee;
+    background: #BCBCB0;
+    /* background: radial-gradient(ellipse at center,#c8c8be 0%,#BCBCB0 100%); */
     max-width: 960px;
     margin: 48px auto;
     padding: 0 32px;

@@ -2,10 +2,12 @@
     var options = {};
     var CONFIG = {
         INPUT_ID: 'input',
-        CONVERSIONS_ID: '#conversions'
+        CONVERSIONS_ID: '#conversions',
+        CONVERSION_POUND_ID: '#pound',
+        CONVERSION_POUND_AND_OUNCE_ID: '#pound-and-ounce'
     };
     var STRINGS = {
-        WAIT: 'Keep typing...',
+        WAIT: 'Type a valid number...',
         SUFFIX_POUND: ' Pounds',
         SUFFIX_OUNCE: ' Ounces'
     };
@@ -15,8 +17,8 @@
     };
 
     function validateData(data) {
-        if (isNaN(data)) {
-            // not a valid number
+        if (isNaN(data) || data === '') {
+            // not a valid number, or empty
             return false;
         }
         return true;
@@ -35,32 +37,41 @@
     }
 
     function toPoundAndOunce(kilo) {
-        var output = STRINGS.WAIT;
+        var output = '';
         var rawPounds = toRawPound(kilo);
+
         var numericalSegments = rawPounds.toString().split('.');
-        console.log(rawPounds, numericalSegments);
-        output = parseInt(numericalSegments[0]).toFixed(0) + STRINGS.SUFFIX_POUND;
-        if (numericalSegments.length === 2) {
-            var remainderPound = '.' + numericalSegments[1];
-            // if there are decimals, display both pounds and ounces
-            var fullOunces = toRawOunce(remainderPound).toFixed(2) + STRINGS.SUFFIX_OUNCE;
-            output += ' ' + fullOunces;
+        var wholePounds = numericalSegments[0];
+        var remainderPounds = numericalSegments[1] ? '.' + numericalSegments[1] : undefined;
+
+        output = parseInt(wholePounds).toFixed(0) + STRINGS.SUFFIX_POUND;
+
+        if (remainderPounds) {
+            var fullOunces = toRawOunce(remainderPounds).toFixed(2) + STRINGS.SUFFIX_OUNCE;
+            output += ' ';
+            output += fullOunces;
         }
         return output;
     }
 
+    function resetOutputs() {
+        // Only display a single wait string, else set to empty.
+        $(CONFIG.CONVERSION_POUND_ID).text(STRINGS.WAIT);
+        $(CONFIG.CONVERSION_POUND_AND_OUNCE_ID).text('');
+    }
+
     function handleInput(e) {
         var input = e.target.value;
-        console.log("input =", input);
         if (validateData(input)) {
-            $(CONFIG.CONVERSIONS_ID).text(toPoundAndOunce(input));
+            $(CONFIG.CONVERSION_POUND_ID).text(toPound(input));
+            $(CONFIG.CONVERSION_POUND_AND_OUNCE_ID).text(toPoundAndOunce(input));
         } else {
-            $(CONFIG.CONVERSIONS_ID).text(STRINGS.WAIT);
+            resetOutputs();
         }
     }
 
     function init() {
-        console.log('init');
+        resetOutputs();
         window.addEventListener(CONFIG.INPUT_ID, handleInput, false);
     }
 
